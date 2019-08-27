@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>文件上传</title>
+</head>
+<body>
+    <script src="js/jquery-3.3.1.js"></script>
+    <script src="js/jquery-3.3.1.min.js"></script>
+ 
+ 	<form enctype="multipart/form-data" id="add-form" accept-charset="UTF-8">
+ 		 配置spc从机：<br>
+       	 主机IP地址: <input type="text" name="host" id="host" ><br>
+       	 端口号：<input type="text" name="port" id="port" value="22"><br>
+       	 用户名：<input type="text" name="userName" id="userName" ><br>
+       	 密码: <input type="password" name="userPwd" id="userPwd" ><br>
+       	 <button type="button" id="btn-add">新增从机</button><br>
+    </form>
+
+
+
+    <form enctype="multipart/form-data" id="upload-form" accept-charset="UTF-8">
+     	 配置文件服务器：<br>
+       	 服务器IP地址: <input type="text" name="host" id="host" value="47.96.190.16"><br>
+       	 端口号：<input type="text" name="port" id="port" value="22"><br>
+       	 用户名：<input type="text" name="userName" id="userName" value="root"><br>
+       	 密码: <input type="password" name="userPwd" id="userPwd" value="nbst123"><br>
+       	 设置文件路径：<br>
+       	 从机文件路径：<input type="text" name="clientDirPath" id="clientDirPath" value="e:/test"><br>
+       	 服务器文件路径: <input type="text" name="serverDirPath" id="serverDirPath" value="d:/test"><br>
+       	 时间间隔: 
+       		<select id="mySelect" name="mySelect">
+       			<option value="day">天</option>
+			  	<option value="hour">时</option>
+			  	<option value="minute">分</option>
+			  	<option value="second">秒</option>
+			</select>
+			<input type="text" name="time" id="time">（用于定时上传）<br>
+    </form>
+    <div><button type="button" id="simple-start">文件上传</button>
+    <button type="button" id="btn-start">定时上传</button>
+    <button type="button" id="btn-stop">停止上传</button></div>
+    
+
+    
+    <script>
+    //新增主机
+    $('#btn-add').click(function() {
+    	var formData = new FormData($('#add-form')[0]);
+        if (window.FormData){
+            $.ajax({
+                type: 'post',
+                url: 'file/addClient.action',
+                data: formData,
+                processData: false,   // 不要去处理发送的数据
+                contentType: false,   // 不要去设置Content-Type请求头
+                success: function(data) {
+                    alert(data.message);
+                }
+            });
+        } else {
+            alert("该浏览器不支持FormData");
+        }
+    });	
+    //简单上传
+    $('#simple-start').click(function() {
+    	var formData = new FormData($('#upload-form')[0]);
+        if (window.FormData){
+            $.ajax({
+                type: 'post',
+                url: 'file/simpleTransfer.action',
+                data: formData,
+                processData: false,   // 不要去处理发送的数据
+                contentType: false,   // 不要去设置Content-Type请求头
+                success: function(data) {
+                    alert(data.message);
+                }
+            });
+        } else {
+            alert("该浏览器不支持FormData");
+        }
+    });	
+    //定时上传
+    $('#btn-start').click(function() {
+    	var formData = new FormData($('#upload-form')[0]);
+    	//获取下拉框值
+    	var a=document.getElementById("mySelect");
+    	//select标签获取的值其实是一个数组--a.options[]; 然后，选定项的下标是--a.selectedIndex
+        console.log($('#upload-form')[0]);
+        if (window.FormData){
+            formData.append("timeUnit",formData.get("mySelect"));
+            $.ajax({
+                type: 'post',
+                url: 'file/startTransfer.action',
+                data: formData,
+                processData: false,   // 不要去处理发送的数据
+                contentType: false,   // 不要去设置Content-Type请求头
+                success: function(data) {
+                    alert(data.message);
+                }
+            });
+        } else {
+            alert("该浏览器不支持FormData");
+        }
+    });	    
+    //停止定时上传
+    $('#btn-stop').click(function() {
+    	 $.ajax({
+             type: 'post',
+             url: 'file/stopTransfer.action',
+             success: function(data) {
+                 alert(data.message);
+             }
+         });
+    });
+    </script>
+    
+    
+</body>
+</html>
